@@ -42,6 +42,11 @@ git push origin "$BRANCH"
 # 6. Authenticate GitHub CLI with GITHUB_TOKEN
 export GITHUB_TOKEN="$GITHUB_TOKEN"
 
+# 6.1. Ensure 'dependencies' label exists
+if ! gh label list --repo "$GITHUB_REPOSITORY" | grep -q '^dependencies'; then
+    gh label create dependencies --color 0366d6 --description "Pull requests that update a dependency file" --repo "$GITHUB_REPOSITORY"
+fi
+
 # 7. Check if PR already exists
 EXISTING_PR=$(gh pr list --head "$BRANCH" --state open --json number --repo "$GITHUB_REPOSITORY" | jq length)
 
