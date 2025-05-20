@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Mark GitHub workspace as safe
+git config --global --add safe.directory "$GITHUB_WORKSPACE"
+
 echo "[bumpercar] Starting bumpercar..."
 
 # 1. Resolve DESCRIPTION file path from input (default is DESCRIPTION)
