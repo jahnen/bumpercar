@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run bumpercar
-        uses: jhk0530/bumpercar@v1.0.0
+        uses: jahnen/bumpercar@v1.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
 ```
