@@ -1,0 +1,11 @@
+name: "bumpercar"
+description: "Update R package versions in DESCRIPTION file using CRAN latest versions."
+author: "Jinhwan Kim"
+inputs:
+  path:
+    description: "Path to DESCRIPTION file"
+    required: false
+    default: "DESCRIPTION"
+runs:
+  using: "docker"
+  image: "Dockerfile"

@@ -1,0 +1,68 @@
+name: bumpercar
+
+on:
+  schedule:
+    - cron: "0 2 * * 1" # Every Monday at 02:00 UTC
+  workflow_dispatch:
+
+jobs:
+  bumpercar:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Git config
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Run bumpercar
+        uses: ./
+
+      - name: Get date
+        id: date
+        run: echo "date=$(date +'%Y%m%d')" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure 'dependencies' label exists
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const labelName = "dependencies";
+            const labelColor = "0366d6";
+            const labelDescription = "Pull requests that update a dependency file";
+
+            try {
+              await github.rest.issues.getLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: labelName
+              });
+              console.log("Label already exists.");
+            } catch (error) {
+              if (error.status === 404) {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name: labelName,
+                  color: labelColor,
+                  description: labelDescription
+                });
+                console.log("Label created.");
+              } else {
+                throw error;
+              }
+            }
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "bump: update DESCRIPTION dependencies"
+          committer: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          title: "bump: update DESCRIPTION dependencies"
+          body: "This PR updates the DESCRIPTION file to use the latest compatible package versions."
+          branch: bumpercar/update-${{ steps.date.outputs.date }}
+          labels: dependencies
+          add-paths: DESCRIPTION
