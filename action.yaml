@@ -1,4 +1,4 @@
-name: "bumpercar"
+name: "Update R Packages"
 description: "Update R package versions in DESCRIPTION file using CRAN latest versions."
 author: "Jinhwan Kim"
 inputs:
