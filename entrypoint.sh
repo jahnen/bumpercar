@@ -42,14 +42,24 @@ git push origin "$BRANCH"
 # 6. Authenticate GitHub CLI with GITHUB_TOKEN
 echo "$GITHUB_TOKEN" | gh auth login --with-token
 
-# 7. Create a pull request
-echo "[bumpercar] Creating pull request..."
-gh pr create \
-    --title "Update DESCRIPTION dependencies" \
-    --body "This PR updates the DESCRIPTION file to the latest compatible CRAN versions." \
-    --head "$BRANCH" \
-    --base "main" \
-    --label dependencies \
-    --repo "$GITHUB_REPOSITORY"
+# 7. Check if PR already exists
+EXISTING_PR=$(gh pr list --head "$BRANCH" --state open --json number --repo "$GITHUB_REPOSITORY" | jq length)
 
-echo "[bumpercar] ✅ Pull request created successfully."
+if [ "$EXISTING_PR" -eq 0 ]; then
+    echo "[bumpercar] Creating pull request..."
+    if gh pr create \
+        --title "Update DESCRIPTION dependencies" \
+        --body "This PR updates the DESCRIPTION file to the latest compatible CRAN versions." \
+        --head "$BRANCH" \
+        --base "main" \
+        --label dependencies \
+        --repo "$GITHUB_REPOSITORY"; then
+        echo "[bumpercar] ✅ Pull request created successfully."
+    else
+        echo "[bumpercar] ❌ Failed to create pull request."
+        gh pr status --repo "$GITHUB_REPOSITORY"
+        exit 1
+    fi
+else
+    echo "[bumpercar] 🚫 Pull request already exists for branch: $BRANCH"
+fi
