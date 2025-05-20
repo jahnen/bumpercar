@@ -40,7 +40,7 @@ git commit -m "chore: update DESCRIPTION dependencies"
 git push origin "$BRANCH"
 
 # 6. Authenticate GitHub CLI with GITHUB_TOKEN
-echo "$GITHUB_TOKEN" | gh auth login --with-token
+export GITHUB_TOKEN="$GITHUB_TOKEN"
 
 # 7. Check if PR already exists
 EXISTING_PR=$(gh pr list --head "$BRANCH" --state open --json number --repo "$GITHUB_REPOSITORY" | jq length)
