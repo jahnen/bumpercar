@@ -9,6 +9,8 @@ inputs:
 runs:
   using: "docker"
   image: "Dockerfile"
-branding: 
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+branding:
   icon: "arrow-up"
   color: "blue"
