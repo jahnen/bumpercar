@@ -8,9 +8,7 @@
 
 ## 📦 Usage
 
-### 1. Add to your R package repository
-
-Create a new workflow file: `.github/workflows/bumpercar.yml`
+Create a new workflow file to your R package repository: `.github/workflows/bumpercar.yml`
 
 ```yaml
 name: Update R DESCRIPTION dependencies
