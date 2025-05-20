@@ -1,8 +1,14 @@
 # tools/bumpercar.R
+
 library(desc)
 library(remotes)
 
-desc_path <- "DESCRIPTION"
+# --- 1. Get DESCRIPTION path from argument or env ---
+args <- commandArgs(trailingOnly = TRUE)
+desc_path <- if (length(args) > 0) args[1] else
+    Sys.getenv("INPUT_PATH", unset = "DESCRIPTION")
+
+message(sprintf("[bumpercar] Using DESCRIPTION file at: %s", desc_path))
 
 # --- FileFetcher: Fetch available CRAN packages ---
 FileFetcher <- function() {
@@ -43,7 +49,7 @@ UpdateChecker <- function(deps, ap) {
                     next
                 }
 
-                # Extract version number from version specification (e.g., ">= 1.1.0")
+                # Extract version number from spec (e.g., ">= 1.1.0")
                 version_match <- regmatches(
                     current_version_spec,
                     regexpr("[0-9]+(\\.[0-9]+)*", current_version_spec)
@@ -53,7 +59,6 @@ UpdateChecker <- function(deps, ap) {
                 current_version <- package_version(version_match)
                 latest_version_parsed <- package_version(latest_version)
 
-                # Only update if the major version is the same and latest is newer
                 if (
                     current_version[[1]][1] == latest_version_parsed[[1]][1] &&
                         latest_version_parsed > current_version
@@ -86,7 +91,7 @@ FileUpdater <- function(d, updates) {
     d
 }
 
-# --- Main workflow ---
+# --- Main flow ---
 ap <- FileFetcher()
 d <- FileParser(desc_path)
 deps <- d$get_deps()

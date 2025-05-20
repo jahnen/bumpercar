@@ -1,16 +1,23 @@
 name: "Update R Packages"
 description: "Update R package versions in DESCRIPTION file using CRAN latest versions."
 author: "Jinhwan Kim"
+
 inputs:
   path:
     description: "Path to DESCRIPTION file"
     required: false
     default: "DESCRIPTION"
+  github_token:
+    description: "GitHub token for creating pull requests"
+    required: true
+
 runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    GITHUB_TOKEN: ${{ inputs.github_token }}
+    INPUT_PATH: ${{ inputs.path }}
+
 branding:
   icon: "arrow-up"
   color: "blue"
