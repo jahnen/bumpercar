@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -e -o pipefail
 
 # Mark GitHub workspace as safe (required for actions in GitHub runners)
 git config --global --add safe.directory "$GITHUB_WORKSPACE"
@@ -35,7 +35,10 @@ Rscript -e "install.packages('pak', repos='https://cran.rstudio.com'); pak::pkg_
 
 # Build the package
 echo "[bumpercar] Building the package..."
-R CMD build .
+if ! R CMD build .; then
+    echo "[bumpercar] ❌ R CMD build failed. Please check the logs above. Exiting."
+    exit 1
+fi
 
 ### TO TEST R CMD check failed, comment R CMD build .
 
@@ -98,13 +101,16 @@ echo "[bumpercar] ✅ R CMD check passed."
 git config --global user.name "github-actions[bot]"
 git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-# Create a new branch for the update and commit the changes
+#    branch for the update and commit the changes
 DATE=$(date +'%Y%m%d')
 BRANCH="bumpercar/update-$DATE"
-git checkout -b "$BRANCH"
+git checkout -B "$BRANCH"
 git add "$DESC_PATH"
 git commit -m "chore: update DESCRIPTION dependencies"
-git push origin "$BRANCH"
+git push origin "$BRANCH" || {
+    echo "[bumpercar] ❌ Failed to push branch $BRANCH to origin. Exiting."
+    exit 1
+}
 
 # Authenticate GitHub CLI with GITHUB_TOKEN
 export GITHUB_TOKEN="$GITHUB_TOKEN"
